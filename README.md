@@ -198,54 +198,82 @@ The **Ingestion Pipeline** transforms raw enterprise documents into structured, 
 ## Architecture / Flow
 
 ```text
-Enterprise Documents
-(PDF / DOCX / TXT / Markdown / HTML)
-              │
-              ▼
-       Document Parsing
-       Text + Sections
-              │
-              ▼
-      Duplicate Detection
-      Filename/Company + SHA-256
-              │
-              ▼
-         Text Cleaning
-   Boilerplate / Watermarks /
-      Repeated Lines / Noise
-              │
-              ▼
-     Business Metadata
- Company / Department / Country /
- Industry / Type / Author / Version
-              │
-              ▼
-     Metadata Normalization
- Company Fuzzy Matching +
- Canonical Business Fields
-              │
-              ▼
-     LLM Content Enrichment
- Groq → Summary / Topics /
-       Keywords / Entities
-              │
-              ▼
-      Semantic Chunking
- Recursive Split + Semantic Merge
-      + Parent/Child Chunks
-              │
-              ▼
-     Embedding Generation
- BAAI/bge-m3 → 1024-D Vectors
-              │
-              ▼
-       Knowledge Storage
- Qdrant → Vectors + Chunks
- SQLite → Documents + Metrics
-              │
-              ▼
-       Retrieval-Ready KB
-     Dense + BM25 Search
+┌──────────────────────────────────────────────────────────────┐
+│                    ENTERPRISE DOCUMENTS                      │
+│            PDF / DOCX / TXT / Markdown / HTML                │
+└──────────────────────────────┬───────────────────────────────┘
+                               │
+                               ▼
+┌──────────────────────────────────────────────────────────────┐
+│                     DOCUMENT PARSING                         │
+│                                                              │
+│              Extract Text + Sections                         │
+└──────────────────────────────┬───────────────────────────────┘
+                               │
+                               ▼
+┌──────────────────────────────────────────────────────────────┐
+│                    DUPLICATE DETECTION                       │
+│                                                              │
+│        Filename + Company Matching + SHA-256 Hash            │
+└──────────────────────────────┬───────────────────────────────┘
+                               │
+                               ▼
+┌──────────────────────────────────────────────────────────────┐
+│                       TEXT CLEANING                          │
+│                                                              │
+│     Boilerplate / Watermarks / Repeated Lines / Noise        │
+└──────────────────────────────┬───────────────────────────────┘
+                               │
+                               ▼
+┌──────────────────────────────────────────────────────────────┐
+│                    BUSINESS METADATA                         │
+│                                                              │
+│  Company / Department / Country / Industry / Type /          │
+│                    Author / Version                          │
+└──────────────────────────────┬───────────────────────────────┘
+                               │
+                               ▼
+┌──────────────────────────────────────────────────────────────┐
+│                  METADATA NORMALIZATION                      │
+│                                                              │
+│       Company Fuzzy Matching + Canonical Business Fields     │
+└──────────────────────────────┬───────────────────────────────┘
+                               │
+                               ▼
+┌──────────────────────────────────────────────────────────────┐
+│                    LLM CONTENT ENRICHMENT                    │
+│                                                              │
+│       Groq → Summary / Topics / Keywords / Entities          │
+└──────────────────────────────┬───────────────────────────────┘
+                               │
+                               ▼
+┌──────────────────────────────────────────────────────────────┐
+│                     SEMANTIC CHUNKING                        │
+│                                                              │
+│   Recursive Split + Semantic Merge + Parent/Child Chunks     │
+└──────────────────────────────┬───────────────────────────────┘
+                               │
+                               ▼
+┌──────────────────────────────────────────────────────────────┐
+│                   EMBEDDING GENERATION                       │
+│                                                              │
+│              BAAI/bge-m3 → 1024-D Vectors                    │
+└──────────────────────────────┬───────────────────────────────┘
+                               │
+                               ▼
+┌──────────────────────────────────────────────────────────────┐
+│                     KNOWLEDGE STORAGE                        │
+│                                                              │
+│        Qdrant → Vectors + Chunks + Metadata                  │
+│        SQLite → Documents + Metrics + Metadata               │
+└──────────────────────────────┬───────────────────────────────┘
+                               │
+                               ▼
+┌──────────────────────────────────────────────────────────────┐
+│                     RETRIEVAL-READY KB                       │
+│                                                              │
+│                 Dense + BM25 Search                          │
+└──────────────────────────────────────────────────────────────┘
 ```
 
 ## Pipeline Stages
@@ -254,9 +282,9 @@ Enterprise Documents
 
 The platform accepts **PDF, DOCX, TXT, Markdown, and HTML/HTM** documents. Format-specific parsers convert uploaded files into structured sections containing extracted text and available page information.
 
-The parser also flags low-text PDFs that may require OCR. The current implementation detects this condition but does not perform a separate OCR workflow.
+The parser also flags low-text PDFs that may require OCR. The current implementation detects this condition and perform a separate OCR workflow.
 
-**Implementation:** `app/ingestion/parser.py`
+**Implementation:**
 
 ### 2. Duplicate Detection
 
@@ -307,22 +335,6 @@ Documents are associated with structured enterprise metadata:
 | Confidentiality | Classification context |
 
 Company resolution is particularly important because company context is also used by the retrieval layer.
-
-**Implementation:** `app/ingestion/metadata_extractor.py`
-
-### 5. Metadata Normalization
-
-Business metadata is normalized before storage.
-
-**Company normalization** uses fuzzy matching and duplicate-cluster consolidation to handle variants such as:
-
-```text
-Saint Gobain
-Saint-Gobain
-Saint Gobin
-```
-
-Department, document type, and country use conservative canonicalization against known values.
 
 **Implementations:**
 
@@ -495,23 +507,6 @@ Payloads        Metrics
    └───────► Retrieval Layer
 ```
 
-## Ingestion Components
-
-| Component | Responsibility |
-|---|---|
-| `pipeline.py` | End-to-end ingestion orchestration |
-| `parser.py` | PDF/DOCX/TXT/Markdown/HTML parsing |
-| `duplicates.py` | Content-hash and duplicate validation |
-| `cleaner.py` | Boilerplate and extraction-noise removal |
-| `metadata_extractor.py` | Business metadata construction |
-| `company_normalization.py` | Company fuzzy matching and consolidation |
-| `normalization.py` | Department/document-type/country normalization |
-| `content_metadata.py` | LLM-based summary/topics/keywords/entities |
-| `chunker.py` | Recursive, semantic and parent-child chunking |
-| `embedder.py` | Dense embedding generation |
-| `vector_store.py` | Qdrant vector storage/search operations |
-| `crud.py` | SQLite document and metric persistence |
-
 ## Key Technical Concepts
 
 - **Multi-format document ingestion**
@@ -526,10 +521,6 @@ Payloads        Metrics
 - **Vector database persistence**
 - **Metadata-aware knowledge organization**
 - **Pipeline instrumentation and observability**
-
-### Recruiter / Interview Highlight
-
-> **The ingestion layer does more than split documents and create embeddings. It creates clean, metadata-rich, semantically structured knowledge units that can later be retrieved using both semantic and lexical signals.**
 
 ---
 
@@ -553,10 +544,6 @@ POST /ask
 ```
 
 Both use the same underlying retrieval engine:
-
-```text
-app/retrieval/retriever.py
-```
 
 ## Architecture / Flow
 
@@ -624,7 +611,7 @@ app/retrieval/retriever.py
 
 ### 1. Query Intake
 
-Users submit natural-language questions through `/search` or `/ask`.
+Users submit natural-language questions through  `/ask`.
 
 Example:
 
@@ -684,11 +671,6 @@ Saint Gobain
 
 The shared matching primitive uses whole-word/phrase boundaries and prefers longer matching values.
 
-**Implementations:**
-
-- `app/retrieval/entity_extraction.py`
-- `app/core/text_matching.py`
-
 ### 4. Query Expansion
 
 Two mechanisms are implemented.
@@ -732,11 +714,6 @@ leave entitlement
 ```
 
 Variants are deduplicated before retrieval.
-
-**Implementations:**
-
-- `app/retrieval/query_understanding.py`
-- `app/retrieval/query_understanding_llm.py`
 
 ### 5. Query Embedding
 
@@ -809,8 +786,6 @@ The implementation maintains an in-process, per-company BM25 index.
 The indexed representation uses child-chunk text together with extracted keywords and topics.
 
 This provides exact lexical matching for terminology, acronyms, policy names, and domain-specific phrases.
-
-**Implementation:** `app/retrieval/bm25_index.py`
 
 > **Implementation note:** BM25 is implemented separately from Qdrant. It is not Qdrant's native sparse-vector retrieval in the current architecture.
 
@@ -912,8 +887,6 @@ Query + Candidate Chunk
 ```
 
 The original query is used for reranking. Expanded variants influence candidate discovery but are not used as the reranking query.
-
-**Implementation:** `app/retrieval/reranker.py`
 
 ### 13. Confidence Classification
 
@@ -1119,20 +1092,6 @@ Qdrant Dense Search    BM25 Search
         LLM-Ready Context
 ```
 
-## Retrieval Components
-
-| Component | Responsibility |
-|---|---|
-| `retriever.py` | Main retrieval orchestration |
-| `entity_extraction.py` | Deterministic query-side entity/filter inference |
-| `query_understanding.py` | Always-on deterministic query expansion |
-| `query_understanding_llm.py` | LLM query understanding for `/ask` |
-| `bm25_index.py` | In-process per-company BM25 index |
-| `reranker.py` | Cross-encoder candidate reranking |
-| `vector_store.py` | Qdrant vector search and chunk operations |
-| `text_matching.py` | Shared whole-word/phrase matching |
-| `debug_trace.py` | Detailed retrieval diagnostics |
-
 ## Key Technical Concepts
 
 - **Query understanding**
@@ -1154,17 +1113,11 @@ Qdrant Dense Search    BM25 Search
 - **Context selection**
 - **LLM-ready context construction**
 
-### Recruiter / Interview Highlight
-
-> **The retrieval layer uses a two-stage hybrid architecture: dense + lexical candidate retrieval followed by RRF fusion and cross-encoder reranking, with metadata-aware filtering and confidence-driven retry logic.**
-
 ---
 
 # Answer Generation
 
 After retrieval, the platform can use selected evidence to generate a grounded response.
-
-**Implementation:** `app/generation/answer_generator.py`
 
 The generation layer supports:
 
@@ -1246,13 +1199,6 @@ The workflow can:
 - Enrich selected results with raw content
 - Filter results for relevance/trustworthiness
 - Combine internal and external evidence
-
-**Implementations:**
-
-- `app/generation/web_search_agent.py`
-- `app/core/web_search.py`
-
-> The current implementation does **not** use LangChain or LangGraph. The agentic behavior is explicitly orchestrated through Python code and bounded LLM calls.
 
 ---
 
@@ -1601,8 +1547,6 @@ QDRANT_URL=
 QDRANT_API_KEY=
 ```
 
-Never commit real API keys or secrets to GitHub.
-
 ## 5. Start the Application
 
 ```bash
@@ -1732,85 +1676,6 @@ Examples include:
 - Low-confidence retrieval can prevent normal answer generation.
 - Web-search failures do not replace the existing internal retrieval response.
 - Metrics failures do not replace the primary ingestion/retrieval result.
-
-> **Optional intelligence and observability should degrade gracefully rather than becoming a single point of failure for the core application.**
-
----
-
-# Testing
-
-The repository includes focused automated tests for core components.
-
-Run:
-
-```bash
-pytest
-```
-
-Current tests cover areas including:
-
-- Chunking
-- Retrieval
-- Web-search agent behavior
-
----
-
-# Current Architecture & Design Trade-offs
-
-## Why Qdrant?
-
-Qdrant provides dense vector storage, cosine similarity search, and payload-based metadata filtering.
-
-## Why SQLite?
-
-SQLite provides lightweight persistence for document records and operational metrics without requiring a separate database server for the current deployment model.
-
-## Why BM25?
-
-BM25 complements semantic retrieval with exact lexical matching for terminology, acronyms, policy names, and domain-specific phrases.
-
-## Why RRF?
-
-Reciprocal Rank Fusion combines independent dense and lexical rankings without requiring their raw score distributions to be directly comparable.
-
-## Why Cross-Encoder Reranking?
-
-Initial retrieval is optimized for candidate recall. The cross-encoder then applies more precise query-document relevance scoring to a smaller candidate set.
-
-## Why Parent-Child Chunks?
-
-Child chunks provide precise retrieval units, while parent sections provide broader context for answer generation.
-
-## Why No LangChain / LangGraph?
-
-The current workflows are bounded and explicitly orchestrated in Python. The project does not claim a LangChain or LangGraph agent implementation.
-
----
-
-# Known Limitations & Future Improvements
-
-The current application is a portfolio-scale AI/RAG system with a local-first architecture.
-
-Potential future improvements include:
-
-- [ ] Authentication and authorization
-- [ ] Role-based document access
-- [ ] Multi-tenant knowledge isolation
-- [ ] Background/asynchronous document ingestion
-- [ ] Streaming LLM responses
-- [ ] Production PostgreSQL deployment
-- [ ] Distributed/shared BM25 indexing
-- [ ] Native sparse-vector retrieval
-- [ ] Shared BM25 cache for multi-worker deployments
-- [ ] Stronger production health checks
-- [ ] Production-grade OCR integration
-- [ ] Larger automated RAG evaluation datasets
-- [ ] Additional retrieval and generation benchmarks
-- [ ] Dedicated official-domain registry for web search
-- [ ] Advanced document version/supersession handling
-- [ ] Production deployment and horizontal scaling
-
----
 
 # What This Project Demonstrates
 
