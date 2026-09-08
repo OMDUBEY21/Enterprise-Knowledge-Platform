@@ -5,22 +5,45 @@ An AI-powered enterprise knowledge platform that organizes company documents int
  ### 1. Knowledge Platform — Home Dashboard
  <img width="1518" height="971" alt="01" src="https://github.com/user-attachments/assets/b2063eb7-80f6-4923-a687-619b443c7239" />
 
- ### 2. Document Upload & Ingestion
+### 2. Document Upload & Ingestion
  <img width="1404" height="927" alt="02" src="https://github.com/user-attachments/assets/8118aa30-7c87-48e4-a549-6cedad35d875" />
 
- ### 3. Document Metadata Configuration
+### 3. Document Metadata Configuration
  <img width="1189" height="909" alt="03" src="https://github.com/user-attachments/assets/317a3554-5114-4ea5-accb-740e1b13fe6c" />
 
- ### 4. Real-Time Document Processing Pipeline
+### 4. Real-Time Document Processing Pipeline
  <img width="1472" height="975" alt="04" src="https://github.com/user-attachments/assets/481705ec-7c88-4670-96ae-f7fa69ee2c6a" />
 
- ### 5. Document Processing — Ingestion Pipeline Completed
+### 5. Document Processing — Ingestion Pipeline Completed
  <img width="1177" height="914" alt="05" src="https://github.com/user-attachments/assets/573de89c-baa5-4546-bae8-34be43a7c2b5" />
 
+### 6. Document Library & Knowledge Base
+<img width="1664" height="976" alt="06" src="https://github.com/user-attachments/assets/9c09f427-60fd-4c39-b3c1-29972628b9b6" />
+
+### 7. Metadata-Based Knowledge Filtering
+<img width="1467" height="1013" alt="07 with filters" src="https://github.com/user-attachments/assets/4d0f1f96-0174-4c1d-beb6-c00fedcc619d" />
+
+### 8. Knowledge Base Question & Answer
+<img width="1574" height="1018" alt="08 asking a question" src="https://github.com/user-attachments/assets/00fe8351-0e0b-4e54-8d75-b8cce44cecf2" />
+
+### 9. Context-Aware Follow-Up Question
+<img width="1581" height="999" alt="09 asking multi question" src="https://github.com/user-attachments/assets/6e9b78ce-fc31-461e-9097-3b036a391e1d" />
 
 
+### 10. Multi-Turn Conversation with Source Citations
+<img width="1585" height="978" alt="10 asking multi question" src="https://github.com/user-attachments/assets/9cca68cf-f642-4fb2-935a-7c988ba470e2" />
 
- 
+
+### 11. Enterprise Knowledge Query with Grounded Sources
+<img width="1775" height="978" alt="11 asking imp" src="https://github.com/user-attachments/assets/4db3206b-0829-4874-9fd2-c0128df7894e" />
+
+### 12. Ingestion Pipeline Evaluation & Quality Metrics
+<img width="1920" height="1631" alt="12 ingestion evaluation" src="https://github.com/user-attachments/assets/b4739d73-7ac8-42b3-b451-38daef5f0fa6" />
+
+
+### 13. Retrieval Evaluation & Evaluation Pipeline
+<img width="1727" height="978" alt="13 Retrival evaluation process start " src="https://github.com/user-attachments/assets/dcaf719d-1aca-4698-87a3-7af6995a1405" />
+
 -----
 
  # Overview
