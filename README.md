@@ -14,6 +14,10 @@ An AI-powered enterprise knowledge platform that organizes company documents int
  ### 4. Real-Time Document Processing Pipeline
  <img width="1472" height="975" alt="04" src="https://github.com/user-attachments/assets/481705ec-7c88-4670-96ae-f7fa69ee2c6a" />
 
+ ### 5. Document Processing — Ingestion Pipeline Completed
+ <img width="1177" height="914" alt="05" src="https://github.com/user-attachments/assets/573de89c-baa5-4546-bae8-34be43a7c2b5" />
+
+
 
 
  
