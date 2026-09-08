@@ -284,8 +284,6 @@ The platform accepts **PDF, DOCX, TXT, Markdown, and HTML/HTM** documents. Forma
 
 The parser also flags low-text PDFs that may require OCR. The current implementation detects this condition and perform a separate OCR workflow.
 
-**Implementation:**
-
 ### 2. Duplicate Detection
 
 Duplicate validation occurs before expensive downstream processing.
@@ -303,8 +301,6 @@ Document → Extracted Text → Normalize → SHA-256
                               Existing Document?
 ```
 
-**Implementation:** `app/ingestion/duplicates.py`
-
 ### 3. Text Cleaning
 
 Parsed sections are cleaned before metadata enrichment and chunking.
@@ -316,8 +312,6 @@ The cleaner removes document noise such as:
 - Repeated lines
 - Page-number artifacts
 - Extraction noise
-
-**Implementation:** `app/ingestion/cleaner.py`
 
 ### 4. Business Metadata Extraction
 
@@ -335,13 +329,6 @@ Documents are associated with structured enterprise metadata:
 | Confidentiality | Classification context |
 
 Company resolution is particularly important because company context is also used by the retrieval layer.
-
-**Implementations:**
-
-- `app/ingestion/company_normalization.py`
-- `app/ingestion/normalization.py`
-
-Explicitly supplied metadata is not silently overridden by an inferred value.
 
 ### 6. LLM-Based Content Enrichment
 
@@ -364,8 +351,6 @@ Structured Content Metadata
 ```
 
 This enrichment is available to downstream retrieval, particularly lexical retrieval and result context.
-
-**Implementation:** `app/ingestion/content_metadata.py`
 
 ### 7. Parent-Child Semantic Chunking
 
@@ -402,8 +387,6 @@ Parent Section
 
 Children provide precise retrieval units, while parents preserve broader context for later answer generation.
 
-**Implementation:** `app/ingestion/chunker.py`
-
 ### 8. Dense Embedding Generation
 
 Every generated chunk is converted into a dense vector using:
@@ -425,8 +408,6 @@ Chunk Text → BAAI/bge-m3 → 1024-D Dense Vector
 ```
 
 The same embedding model/path is used for query embeddings during retrieval.
-
-**Implementation:** `app/ingestion/embedder.py`
 
 > **Implementation note:** `bge-m3` supports additional sparse and ColBERT-style representations, but this application uses its **dense embedding output**. Lexical retrieval is implemented separately using BM25.
 
@@ -454,12 +435,6 @@ Document-level information and operational metrics are stored in **SQLite**.
      Vectors + Chunks      Documents + Metrics
      Metadata Payloads
 ```
-
-**Implementations:**
-
-- `app/core/vector_store.py`
-- `app/database/`
-- `app/ingestion/pipeline.py`
 
 ### 10. Ingestion Metrics & Observability
 
@@ -506,22 +481,6 @@ Payloads        Metrics
    │
    └───────► Retrieval Layer
 ```
-
-## Key Technical Concepts
-
-- **Multi-format document ingestion**
-- **Structured text extraction**
-- **SHA-256 duplicate detection**
-- **Metadata extraction and normalization**
-- **LLM-based content enrichment**
-- **Semantic chunking**
-- **Parent-child chunk architecture**
-- **Dense vector embeddings**
-- **Batch embedding generation**
-- **Vector database persistence**
-- **Metadata-aware knowledge organization**
-- **Pipeline instrumentation and observability**
-
 ---
 
 # Retrieval Pipeline
@@ -830,8 +789,6 @@ k = 60
 
 A chunk appearing in both result lists receives contributions from both rankings.
 
-The current implementation is **rank-based RRF**; raw vector-similarity and BM25 score magnitudes are not directly combined.
-
 ### 11. Candidate Selection
 
 After fusion, candidates are sorted by accumulated RRF score.
@@ -1091,27 +1048,6 @@ Qdrant Dense Search    BM25 Search
                ▼
         LLM-Ready Context
 ```
-
-## Key Technical Concepts
-
-- **Query understanding**
-- **Query expansion**
-- **Entity inference**
-- **Metadata-aware retrieval**
-- **Dense vector retrieval**
-- **Qdrant cosine similarity search**
-- **BM25 lexical retrieval**
-- **Hybrid search**
-- **Reciprocal Rank Fusion**
-- **Candidate generation**
-- **Cross-encoder reranking**
-- **Top-K retrieval**
-- **Parent-child retrieval**
-- **Confidence scoring**
-- **Filter relaxation**
-- **Evidence-based company inference**
-- **Context selection**
-- **LLM-ready context construction**
 
 ---
 
