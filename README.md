@@ -2,6 +2,21 @@
 An AI-powered enterprise knowledge platform that organizes company documents into a searchable knowledge base, enabling users to explore information and ask questions with contextual, cited answers from internal and trusted external sources.
 
  # Application Screenshots
+ ### 1. Knowledge Platform — Home Dashboard
+ <img width="1518" height="971" alt="01" src="https://github.com/user-attachments/assets/b2063eb7-80f6-4923-a687-619b443c7239" />
+
+ ### 2. Document Upload & Ingestion
+ <img width="1404" height="927" alt="02" src="https://github.com/user-attachments/assets/8118aa30-7c87-48e4-a549-6cedad35d875" />
+
+ ### 3. Document Metadata Configuration
+ <img width="1189" height="909" alt="03" src="https://github.com/user-attachments/assets/317a3554-5114-4ea5-accb-740e1b13fe6c" />
+
+ ### 4. Real-Time Document Processing Pipeline
+ <img width="1472" height="975" alt="04" src="https://github.com/user-attachments/assets/481705ec-7c88-4670-96ae-f7fa69ee2c6a" />
+
+
+
+ 
 -----
 
  # Overview
