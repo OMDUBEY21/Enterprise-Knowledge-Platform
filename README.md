@@ -44,6 +44,17 @@ An AI-powered enterprise knowledge platform that organizes company documents int
 ### 13. Retrieval Evaluation & Evaluation Pipeline
 <img width="1727" height="978" alt="13 Retrival evaluation process start " src="https://github.com/user-attachments/assets/dcaf719d-1aca-4698-87a3-7af6995a1405" />
 
+### 14. Retrieval Evaluation & Strategy Comparison
+<img width="1664" height="760" alt="14 evalution retrival" src="https://github.com/user-attachments/assets/7a70eca1-5de9-41bf-b905-c9f70bd45ab6" />
+
+
+### 15. RAG Generation Evaluation & Answer Quality
+<img width="1920" height="1565" alt="15 generation" src="https://github.com/user-attachments/assets/b2339705-29c3-42d6-93d9-8828730d9bac" />
+
+
+### 16. Knowledge Base & AI Retrieval Settings
+<img width="1634" height="1006" alt="16 settings" src="https://github.com/user-attachments/assets/d17bf2eb-8d85-4a91-9941-9ec32050ffcc" />
+
 -----
 
  # Overview
